@@ -129,8 +129,8 @@ def bbox_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7
     return iou  # IoU
 
 
-#def mask_iou(mask1, mask2, eps=1e-7):
-#    """
+def mask_iou(mask1, mask2, eps=1e-7):
+    """
 #    Calculate masks IoU.
 #
 #    Args:
@@ -142,10 +142,10 @@ def bbox_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7
 #
 #    Returns:
 #        (torch.Tensor): A tensor of shape (N, M) representing masks IoU.
-#    """
-#    intersection = torch.matmul(mask1, mask2.T).clamp_(0)
-#    union = (mask1.sum(1)[:, None] + mask2.sum(1)[None]) - intersection  # (area1 + area2) - intersection
-#    return intersection / (union + eps)
+    """
+    intersection = torch.matmul(mask1, mask2.T).clamp_(0)
+    union = (mask1.sum(1)[:, None] + mask2.sum(1)[None]) - intersection  # (area1 + area2) - intersection
+    return intersection / (union + eps)
 
 def DICE(mask1, mask2, eps=1e-7):
     """
@@ -995,7 +995,7 @@ class SegmentMetrics(SimpleClass):
             "metrics/mAP50-95(B)",
             "metrics/precision(M)",
             "metrics/recall(M)",
-            "metrics/DICE(M)",
+            "metrics/mAP50(M)",
             "metrics/mAP50-95(M)",
         ]
 

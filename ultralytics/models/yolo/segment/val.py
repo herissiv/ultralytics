@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from ultralytics.models.yolo.detect import DetectionValidator
 from ultralytics.utils import LOGGER, NUM_THREADS, ops
 from ultralytics.utils.checks import check_requirements
-from ultralytics.utils.metrics import SegmentMetrics, box_iou, DICE
+from ultralytics.utils.metrics import SegmentMetrics, box_iou, mask_iou
 from ultralytics.utils.plotting import output_to_target, plot_images
 
 
@@ -153,7 +153,7 @@ class SegmentationValidator(DetectionValidator):
                     ratio_pad=batch["ratio_pad"][si],
                 )
                 self.pred_to_json(predn, batch["im_file"][si], pred_masks)
-            # if self.args.save_txt:
+            #if self.args.save_txt:
             #    save_one_txt(predn, save_conf, shape, file=save_dir / 'labels' / f'{path.stem}.txt')
 
     def finalize_metrics(self, *args, **kwargs):
@@ -181,7 +181,7 @@ class SegmentationValidator(DetectionValidator):
             if gt_masks.shape[1:] != pred_masks.shape[1:]:
                 gt_masks = F.interpolate(gt_masks[None], pred_masks.shape[1:], mode="bilinear", align_corners=False)[0]
                 gt_masks = gt_masks.gt_(0.5)
-            iou = DICE(gt_masks.view(gt_masks.shape[0], -1), pred_masks.view(pred_masks.shape[0], -1))
+            iou = mask_iou(gt_masks.view(gt_masks.shape[0], -1), pred_masks.view(pred_masks.shape[0], -1))
         else:  # boxes
             iou = box_iou(gt_bboxes, detections[:, :4])
 
@@ -237,11 +237,14 @@ class SegmentationValidator(DetectionValidator):
                 {
                     "image_id": image_id,
                     "category_id": self.class_map[int(p[5])],
-                    "bbox": [round(x, 3) for x in b],
-                    "score": round(p[4], 5),
+                    #"bbox": [round(x, 3) for x in b],
+                    #"score": round(p[4], 5),
                     "segmentation": rles[i],
                 }
             )
+            with open("/home/heris/master_thesis_ultralytics_forked/"+str(image_id), 'w') as file: 
+                file.write(f"Segmentation map: {str(rles[i])}") 
+
 
     def eval_json(self, stats):
         """Return COCO-style object detection evaluation metrics."""
