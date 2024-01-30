@@ -240,6 +240,7 @@ class SegmentationValidator(DetectionValidator):
                     "bbox": [round(x, 3) for x in b],
                     "score": round(p[4], 5),
                     "segmentation": rles[i],
+                    "iou_score": iou
                 }
             )
 
