@@ -232,7 +232,7 @@ class SegmentationValidator(DetectionValidator):
         pred_masks = np.transpose(pred_masks, (2, 0, 1))
         with ThreadPool(NUM_THREADS) as pool:
             rles = pool.map(single_encode, pred_masks)
-        for i, (p, b, iou_score) in enumerate(zip(predn.tolist(), box.tolist(), iou)):
+        for i, (p, b, iou_score) in enumerate(zip(predn.tolist(), box.tolist(), iou.tolist())):
             self.jdict.append(
                 {
                     "image_id": image_id,
