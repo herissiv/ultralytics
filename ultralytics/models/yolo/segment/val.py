@@ -131,8 +131,8 @@ class SegmentationValidator(DetectionValidator):
 
             # Evaluate
             if nl:
-                stat["tp"] = self._process_batch(predn, bbox, cls)
-                stat["tp_m"] = self._process_batch(
+                stat["tp"], not_iou = self._process_batch(predn, bbox, cls)
+                stat["tp_m"], iou = self._process_batch(
                     predn, bbox, cls, pred_masks, gt_masks, self.args.overlap_mask, masks=True
                 )
                 if self.args.plots:
@@ -152,7 +152,7 @@ class SegmentationValidator(DetectionValidator):
                     pbatch["ori_shape"],
                     ratio_pad=batch["ratio_pad"][si],
                 )
-                self.pred_to_json(predn, batch["im_file"][si], pred_masks)
+                self.pred_to_json(predn, batch["im_file"][si], pred_masks, iou)
             #if self.args.save_txt:
             #    save_one_txt(predn, save_conf, shape, file=save_dir / 'labels' / f'{path.stem}.txt')
 
@@ -185,7 +185,7 @@ class SegmentationValidator(DetectionValidator):
         else:  # boxes
             iou = box_iou(gt_bboxes, detections[:, :4])
 
-        return self.match_predictions(detections[:, 5], gt_cls, iou)
+        return self.match_predictions(detections[:, 5], gt_cls, iou), iou
 
     def plot_val_samples(self, batch, ni):
         """Plots validation samples with bounding box labels."""
@@ -214,7 +214,7 @@ class SegmentationValidator(DetectionValidator):
         )  # pred
         self.plot_masks.clear()
 
-    def pred_to_json(self, predn, filename, pred_masks,iou):
+    def pred_to_json(self, predn, filename, pred_masks, iou):
         """Save one JSON result."""
         # Example result = {"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}
         from pycocotools.mask import encode  # noqa
