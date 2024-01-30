@@ -242,8 +242,6 @@ class SegmentationValidator(DetectionValidator):
                     "segmentation": rles[i],
                 }
             )
-            with open("/home/heris/master_thesis_ultralytics_forked/"+str(image_id), 'w') as file: 
-                file.write(f"Segmentation map: {str(rles[i])}") 
 
 
     def eval_json(self, stats):
