@@ -214,7 +214,7 @@ class SegmentationValidator(DetectionValidator):
         )  # pred
         self.plot_masks.clear()
 
-    def pred_to_json(self, predn, filename, pred_masks):
+    def pred_to_json(self, predn, filename, pred_masks,iou):
         """Save one JSON result."""
         # Example result = {"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}
         from pycocotools.mask import encode  # noqa
@@ -232,13 +232,13 @@ class SegmentationValidator(DetectionValidator):
         pred_masks = np.transpose(pred_masks, (2, 0, 1))
         with ThreadPool(NUM_THREADS) as pool:
             rles = pool.map(single_encode, pred_masks)
-        for i, (p, b) in enumerate(zip(predn.tolist(), box.tolist())):
+        for i, (p, b, iou_score) in enumerate(zip(predn.tolist(), box.tolist(), iou)):
             self.jdict.append(
                 {
                     "image_id": image_id,
                     "category_id": self.class_map[int(p[5])],
-                    #"bbox": [round(x, 3) for x in b],
-                    #"score": round(p[4], 5),
+                    "bbox": [round(x, 3) for x in b],
+                    "score": round(p[4], 5),
                     "segmentation": rles[i],
                 }
             )
